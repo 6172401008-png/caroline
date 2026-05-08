@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ESP32 Control</title>
+</head>
+<body>
+  <h2>Kontrol ESP32</h2>
+
+  <button onclick="connect()">Connect</button><br><br>
+
+  <button onclick="kirim('on')">LED ON</button>
+  <button onclick="kirim('off')">LED OFF</button><br><br>
+
+  <button onclick="kirim('kiri')">Kiri</button>
+  <button onclick="kirim('tengah')">Tengah</button>
+  <button onclick="kirim('kanan')">Kanan</button><br><br>
+
+  <button onclick="kirim('auto')">AUTO</button>
+
+<script>
+let device, server, char;
+
+async function connect() {
+  device = await navigator.bluetooth.requestDevice({
+    filters: [{ name: "ESP32_SMART" }],
+    optionalServices: ["6e400001-b5a3-f393-e0a9-e50e24dcca9e"]
+  });
+
+  server = await device.gatt.connect();
+  const service = await server.getPrimaryService("6e400001-b5a3-f393-e0a9-e50e24dcca9e");
+  char = await service.getCharacteristic("6e400002-b5a3-f393-e0a9-e50e24dcca9e");
+
+  alert("Terhubung!");
+}
+
+function kirim(data) {
+  const encoder = new TextEncoder();
+  char.writeValue(encoder.encode(data));
+}
+</script>
+
+</body>
+</html>
